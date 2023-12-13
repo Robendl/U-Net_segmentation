@@ -109,6 +109,7 @@ class UNet(nn.Module):
         x = self.out(x)
         return x
 
+
 def main():
     model = UNet(in_channels=1, out_channels=1)
     model = model.cuda()
@@ -129,7 +130,6 @@ def main():
             
             output_binary = (output > 0.5).float()
 
-
             # print(org_image.shape)
             # org_image = org_image.detach().cpu().numpy()
             # org_image = pil_im.fromarray((org_image * 255).astype(np.uint8))
@@ -142,4 +142,6 @@ def main():
             output_image = output_image.convert("L")
             output_image.save('tensor_image.png')
 
-main()
+
+if __name__ == '__main__':
+    main()

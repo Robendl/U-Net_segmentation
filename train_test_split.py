@@ -1,9 +1,6 @@
 import os
-import nibabel as nib
-import numpy as np
-import matplotlib.pyplot as plt
-import random
 import shutil
+import random
 
 
 def copy_images(source_path, dest_path, ids):
@@ -16,62 +13,7 @@ def copy_images(source_path, dest_path, ids):
         shutil.copy(source_dir, dest_dir)
 
 
-def convert_data():
-    random_state = 12
-
-    # Path to the directory containing your images and labels
-    images_dir = 'data/imagesTr'
-    labels_dir = 'data/labelsTr'
-    output_dir_non_tumor_images = 'data/non_tumor_images_png'
-    output_dir_tumor_images = 'data/tumor_images_png'
-    output_dir_labels = 'data/labels_png'
-
-    os.makedirs(output_dir_labels, exist_ok=True)
-    os.makedirs(output_dir_non_tumor_images, exist_ok=True)
-    os.makedirs(output_dir_tumor_images, exist_ok=True)
-
-    # List all the .nii.gz files in the directory
-    file_list = [file for file in os.listdir(images_dir) if file.endswith('.nii.gz') and file.startswith('lung')]
-    modified_list = [file_name[:-7] for file_name in file_list]
-    len_list = len(modified_list)
-    label_idx = 0
-    non_tumor_idx = 0
-
-    for idx, file in enumerate(file_list):
-        print(f'\r{idx}/{len(file_list)}', end='')
-        # Load the label
-        label_path = os.path.join(labels_dir, file)
-        label = nib.load(label_path).get_fdata()
-
-        # Load the corresponding image
-        image_path = os.path.join(images_dir, file)
-        img = nib.load(image_path).get_fdata()
-
-        labels_size = label.shape[2]
-        indices = list(range(0, labels_size))
-
-        # Convert slices with tumor labels to PNG
-        for i in range(labels_size):  # Loop through the slices
-            label_slice = label[:, :, i]
-            ones = np.sum(label_slice == 1.0)
-
-            slice_img = ((img[:, :, i] - np.min(img[:, :, i])) / (np.max(img[:, :, i]) - np.min(img[:, :, i]))) * 255.0
-            slice_img = slice_img.astype(np.uint8)
-
-            if ones == 0:
-                output_file_imgs = os.path.join(output_dir_non_tumor_images, ("image" + str(non_tumor_idx) + ".png"))
-                plt.imsave(output_file_imgs, slice_img)
-                non_tumor_idx = non_tumor_idx + 1
-
-            if ones > 0.015 * label_slice.shape[0]:
-                # Save the slice as PNG
-                output_file_imgs = os.path.join(output_dir_tumor_images, ("image" + str(label_idx) + ".png"))
-                output_file_labels = os.path.join(output_dir_labels, ("image" + str(label_idx) + ".png"))
-                plt.imsave(output_file_imgs, slice_img)
-                plt.imsave(output_file_labels, label_slice)
-
-                label_idx = label_idx + 1
-
+def train_test_split():
     # Source and destination directories
     train_non_tumor_simclr_dir = 'data/train/non_tumor_images_simclr'
     train_non_tumor_cnn_dir = 'data/train/non_tumor_images_cnn'
@@ -124,4 +66,4 @@ def convert_data():
 
 
 if __name__ == '__main__':
-    convert_data()
+    train_test_split()

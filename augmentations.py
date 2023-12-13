@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def perform_augmentations(image, mask, resize=False):
     # Resize
     if resize:
@@ -22,6 +23,5 @@ def perform_augmentations(image, mask, resize=False):
     if np.random.rand() < 0.1:
         image = cv2.flip(image, 0)
         mask = cv2.flip(mask, 0)
-
 
     return image, mask
