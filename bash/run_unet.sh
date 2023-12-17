@@ -9,7 +9,7 @@
 #SBATCH --output=unet.out
 
 
-source /home1/s3799492/machine_learning/environment/bin/activate
+source /home1/s3799174/machine_learning/venv/bin/activate
 
 module load Python/3.10.4-GCCcore-11.3.0
 module load OpenCV/4.6.0-foss-2022a-contrib
