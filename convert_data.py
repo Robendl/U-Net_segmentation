@@ -63,7 +63,7 @@ def convert_data():
                 plt.imsave(output_file_imgs, slice_img)
                 non_tumor_idx = non_tumor_idx + 1
 
-            if ones > 0.015 * label_slice.shape[0]:
+            if ones > 0.005 * (label_slice.shape[0] * label_slice.shape[1]):
                 # Save the slice as PNG
                 output_file_imgs = os.path.join(output_dir_tumor_images, ("image" + str(label_idx) + ".png"))
                 output_file_labels = os.path.join(output_dir_labels, ("image" + str(label_idx) + ".png"))
@@ -92,19 +92,30 @@ def convert_data():
     os.makedirs(test_tumor_dir, exist_ok=True)
     os.makedirs(test_labels_dir, exist_ok=True)
 
-    non_tumor_indices = list(range(16000))
-    tumor_indices = list(range(1638))
+
+    non_tumor_dir = os.listdir(output_dir_non_tumor_images)
+    num_non_tumor = len([file for file in non_tumor_dir if os.path.isfile(os.path.join(output_dir_non_tumor_images, file))])
+    # print("len files", num_non_tumor)
+
+    tumor_dir = os.listdir(output_dir_tumor_images)
+    num_tumor = len([file for file in tumor_dir if os.path.isfile(os.path.join(output_dir_tumor_images, file))])
+    # print("len files", num_tumor)
+    # print((num_non_tumor-num_tumor-50))
+    # print((num_tumor-50))
+    # exit()
+
+    non_tumor_indices = list(range(num_non_tumor))
+    tumor_indices = list(range(num_tumor))
     random.shuffle(non_tumor_indices)
     random.shuffle(tumor_indices)
 
-    train_non_tumor_simclr_ids = non_tumor_indices[:13362]
-    train_non_tumor_cnn_ids = non_tumor_indices[13362:14950]
-    train_tumor_ids = tumor_indices[:1588]
+    train_non_tumor_simclr_ids = non_tumor_indices[:(num_non_tumor-num_tumor-1000)]
+    train_non_tumor_cnn_ids = non_tumor_indices[(num_non_tumor-num_tumor-1000):(num_non_tumor-1050)]
+    train_tumor_ids = tumor_indices[:(num_tumor-50)]
 
     test_non_tumor_simclr_ids = non_tumor_indices[14950:15950]
     test_non_tumor_cnn_ids = non_tumor_indices[15950:]
-    test_non_tumor_cnn_ids = non_tumor_indices[15950:]
-    test_tumor_ids = tumor_indices[1588:1638]
+    test_tumor_ids = tumor_indices[:num_tumor]
 
     print(len(train_non_tumor_simclr_ids))
     print(len(train_non_tumor_cnn_ids))
