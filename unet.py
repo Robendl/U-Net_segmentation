@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from augmentations import *
 
+
 class ImageDataset(Dataset):
     def __init__(self, indices, image_indices, transform=False):
         self.indices = indices
@@ -41,6 +42,7 @@ class ImageDataset(Dataset):
         
         return image, label
 
+
 class DownConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DownConv, self).__init__()
@@ -58,6 +60,7 @@ class DownConv(nn.Module):
         x = self.conv(x)
         x_pool = self.pool(x)
         return x, x_pool
+
 
 class UpConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -77,6 +80,7 @@ class UpConv(nn.Module):
         x = torch.cat([x2, x1], dim=1)
         x = self.conv(x)
         return x
+
 
 class UNet(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -99,7 +103,6 @@ class UNet(nn.Module):
         self.up4 = UpConv(128,64)
 
         # self.out = nn.Conv2d(64, out_channels, kernel_size=1)
-
 
     def forward(self, x):
         x1, x = self.down1(x)
@@ -137,7 +140,6 @@ class UnetWithHeader(nn.Module):
         return output
 
 
-
 def dice_loss(y_pred, y_true):
     smooth = 1e-5
     y_true = y_true.view(-1, 512, 512)
@@ -146,6 +148,7 @@ def dice_loss(y_pred, y_true):
     sum_ = torch.sum(y_true + y_pred)
     dice = (2. * intersection + smooth) / (sum_ + smooth)
     return 1. - dice
+
 
 def validate(dataloader_valset, model):
     model.eval()
@@ -179,7 +182,6 @@ def main():
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="cls")
     model = model.cuda()
 
-
     train_indices = list(range(0,2450))
     valid_indices = list(range(0,307))
 
@@ -200,7 +202,6 @@ def main():
 
     valid_dataset = ImageDataset(valid_indices, valid_image_indices)
     dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
@@ -226,7 +227,6 @@ def main():
             batch_counter += 1
             total_loss += loss.item()
 
-
         valid_loss = validate(dataloader_valset, model)
 
         if valid_loss < best_valid_loss:
@@ -241,4 +241,5 @@ def main():
         print("valid loss", valid_loss)
 
 
-main()
+if __name__ == '__main__':
+    main()
