@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 import cv2
-import random
 import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from augmentations import *
 from network import *
+
 
 class ImageDataset(Dataset):
     def __init__(self, indices, image_indices, transform=False):
@@ -156,4 +156,5 @@ def main():
         print("valid loss", valid_loss)
 
 
-main()
+if __name__ == '__main__':
+    main()

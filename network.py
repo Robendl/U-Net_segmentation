@@ -1,12 +1,5 @@
 import torch
 import torch.nn as nn
-import cv2
-import random
-import numpy as np
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-import torch.optim as optim
-import torch.nn.functional as F
 
 
 class DownConv(nn.Module):
@@ -27,6 +20,7 @@ class DownConv(nn.Module):
         x_pool = self.pool(x)
         return x, x_pool
 
+
 class UpConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(UpConv, self).__init__()
@@ -45,6 +39,7 @@ class UpConv(nn.Module):
         x = torch.cat([x2, x1], dim=1)
         x = self.conv(x)
         return x
+
 
 class UNet(nn.Module):
     def __init__(self, in_channels, out_channels, mode):
@@ -69,7 +64,6 @@ class UNet(nn.Module):
         self.up4 = UpConv(128,64)
 
         # self.out = nn.Conv2d(64, out_channels, kernel_size=1)
-
 
     def forward(self, x):
         x1, x = self.down1(x)
@@ -108,7 +102,6 @@ class UnetWithHeader(nn.Module):
         elif self.mode == "simclr":
             self.gap = nn.AdaptiveAvgPool2d(1)
             self.head = nn.Sequential(nn.Linear(512, 512), nn.Linear(512, 128))
-
 
     def forward(self, x):
         y = self.unet(x)

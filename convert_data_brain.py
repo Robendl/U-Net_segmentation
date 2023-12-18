@@ -1,14 +1,7 @@
 import os
-import shutil
-
 import cv2
 import numpy as np
-
 from create_mask import create_mask
-
-
-def remove_black_space(img, label):
-    return
 
 
 def convert_data_brain():

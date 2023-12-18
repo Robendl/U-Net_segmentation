@@ -1,12 +1,8 @@
 import torch
-import torch.nn as nn
 import cv2
-import random
 import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-import matplotlib.pyplot as plt
-import torch.optim as optim
 from PIL import Image
 from network import *
 
@@ -37,6 +33,7 @@ class ImageDataset(Dataset):
         
         return image, label
 
+
 def f1_score(predicted, mask):
     predicted_flat = predicted.view(-1)  # flatten the predicted image
     mask_flat = mask.view(-1)  # flatten the mask
@@ -47,6 +44,7 @@ def f1_score(predicted, mask):
     recall = TP / (TP + FN + 1e-7)  # recall
     F1 = 2 * (precision * recall) / (precision + recall + 1e-7)  # F1 score
     return F1.item()  # convert tensor to scalar value
+
 
 def main():
     total_f1_score = 0
@@ -84,8 +82,10 @@ def main():
             output_image = output_image.convert("L")
             output_image.save('results/mask' + str(idx) + '.png')
 
-    
     total_f1_score = total_f1_score / 307
 
     print("mean f1 score", total_f1_score)
-main()
+
+
+if __name__ == '__main__':
+    main()

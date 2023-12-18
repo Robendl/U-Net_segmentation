@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import random
 
+
 def perform_augmentations(image, mask):
     # Rotate
     angle = np.random.uniform(-35, 35)
@@ -18,7 +19,6 @@ def perform_augmentations(image, mask):
     if np.random.rand() < 0.1:
         image = cv2.flip(image, 0)
         mask = cv2.flip(mask, 0)
-
 
     return image, mask
 
@@ -37,16 +37,17 @@ def perform_augmentations_simclr(image1, image2):
             image = aug(image)
 
         images.append(image)
-    
+
     return images[0], images[1]
 
 
 def gaussian_blurring(image):
-    if np.random.rand() < 0.5:        
+    if np.random.rand() < 0.5:
         blur_idx = random.choice([num for num in range(1, 41) if num % 2 != 0])
         image = cv2.GaussianBlur(image, (blur_idx, blur_idx), 0)
 
     return image
+
 
 def gaussian_noise(image):
     if np.random.rand() < 0.5:
@@ -58,8 +59,9 @@ def gaussian_noise(image):
         gauss = gauss.reshape(row, col, ch)
 
         image = cv2.add(image, gauss)
-    
+
     return image
+
 
 def translation(image):
     if np.random.rand() < 0.5:
@@ -72,6 +74,7 @@ def translation(image):
 
     return image
 
+
 def rotate(image):
     if np.random.rand() < 0.5:
         height, width = image.shape[:2]
@@ -80,6 +83,7 @@ def rotate(image):
         image = cv2.warpAffine(image, rotation_matrix, (width, height))
 
     return image
+
 
 def zoom_out(image):
     if np.random.rand() < 0.5:
@@ -95,6 +99,7 @@ def zoom_out(image):
         image = cv2.resize(roi, (width, height), interpolation=cv2.INTER_AREA)
 
     return image
+
 
 def salt_pepper_noise(image):
     if np.random.rand() < 0.5:
