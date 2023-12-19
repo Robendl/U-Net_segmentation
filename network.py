@@ -109,5 +109,7 @@ class UnetWithHeader(nn.Module):
         if self.mode == 'simclr':
             y = self.gap(y)
             output = self.head(y.squeeze())
+            return output
+        
         output = self.head(y)
         return output
