@@ -9,6 +9,8 @@ from augmentations import *
 from network import *
 from cross_validation import *
 
+from sklearn.model_selection import StratifiedKFold
+
 
 class ImageDataset(Dataset):
     def __init__(self, indices, image_indices, transform=False):
@@ -95,67 +97,91 @@ def main():
     model = model.cuda()
 
     #model = load_path(model, "results/simclr.pth")
-    #splits = cross_validation(validation=validation, features=data, labels=labels)
-
-    train_indices = list(range(0,2450))
-    valid_indices = list(range(0,307))
-
-    image_indices = list(range(0,2757))
-    random.shuffle(image_indices)
-
-    train_image_indices = image_indices[0:2450]
-    valid_image_indices = image_indices[2450:2757]
-
+    
     num_epochs = 30
     batch_size = 8
     learning_rate = 0.00001
     best_valid_loss = np.Inf
     bce_loss = nn.BCEWithLogitsLoss()
 
-    train_dataset = ImageDataset(train_indices, train_image_indices, True)
-    dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    # train_indices = list(range(0,2450))
+    # valid_indices = list(range(0,307))
 
-    valid_dataset = ImageDataset(valid_indices, valid_image_indices)
-    dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    # image_indices = list(range(0,2757))
+    # random.shuffle(image_indices)
 
+    # train_image_indices = image_indices[0:2450]
+    # valid_image_indices = image_indices[2450:2757]    
+
+    # train_dataset = ImageDataset(train_indices, train_image_indices, True)
+    # dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    # valid_dataset = ImageDataset(valid_indices, valid_image_indices)
+    # dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    #splits = cross_validation(features=dataloader_trainset, labels=labels) #aanroep van de CV --> kan dus eigen functie worden vanaf 127 --> 138
+    image_indices = list(range(0,2757))
+    dataset = ImageDataset(image_indices)
+    dataloader_dataset = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
+    X=dataloader_dataset
+    y=labels # Wat is dit, of kan dit losgelaten worden en labels uitgelezen zoals bij 155?
+    n_splits=4
+    kf = StratifiedKFold(n_splits=n_splits)
+    splits = []
+
+    for train_index, test_index in kf.split(X, y):
+        train_index = train_index.tolist()
+        test_index = test_index.tolist()
+        dataloader_trainset, dataloader_valset = X.iloc[train_index], X.iloc[test_index]
+        y_train, y_test = y.iloc[train_index], y.iloc[test_index] # nogmaals, y is dus een vraagteken 
+        splits.append((dataloader_trainset, dataloader_valset, y_train, y_test))
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
-                                                                            last_epoch=-1)
 
-    for epoch in range(num_epochs):
-        model.train()
-        total_loss = 0.0
-        batch_counter = 1
+    split_counter = 0
+    scores = []
+    for (dataloader_trainset, dataloader_valset, y_train, y_test) in splits: #Iteration over de CV voor het aantal splits (staat op 4)
+        print("Split: ", split_counter)
 
-        for (images, labels) in dataloader_trainset:
-            optimizer.zero_grad()
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
+                                                                            last_epoch=-1)   
 
-            images = images.permute(0, 3, 1, 2)
-            output = model(images.float().to('cuda'))
-            labels = labels.float().to('cuda')
-            output_sigmoid = torch.sigmoid(output)
-                
-            loss = dice_loss(output_sigmoid.squeeze(), labels) + bce_loss(output.squeeze(), labels)
+        for epoch in range(num_epochs):
+            model.train()
+            total_loss = 0.0
+            batch_counter = 1
 
-            loss.backward()
-            optimizer.step()
-            batch_counter += 1
-            total_loss += loss.item()
+            for (images, labels) in dataloader_trainset:
+                optimizer.zero_grad()
+
+                images = images.permute(0, 3, 1, 2)
+                output = model(images.float().to('cuda'))
+                labels = labels.float().to('cuda')
+                output_sigmoid = torch.sigmoid(output)
+                    
+                loss = dice_loss(output_sigmoid.squeeze(), labels) + bce_loss(output.squeeze(), labels)
+
+                loss.backward()
+                optimizer.step()
+                batch_counter += 1
+                total_loss += loss.item()
 
 
-        valid_loss = validate(dataloader_valset, model)
+            valid_loss = validate(dataloader_valset, model)
 
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            save_file = "results/unet.pth" 
-            save_model(model, save_file)
+            if valid_loss < best_valid_loss:
+                best_valid_loss = valid_loss
+                save_file = "results/unet.pth" 
+                save_model(model, save_file)
 
-        total_loss /= batch_counter
+            total_loss /= batch_counter
 
-        print("EPOCH: ", int(epoch))
-        print("train loss", total_loss)
-        print("valid loss", valid_loss)
+            print("EPOCH: ", int(epoch))
+            print("train loss", total_loss)
+            print("valid loss", valid_loss)
+
+        scores.append(total_loss) # Moet een score toegevoegd worden per split. Voor nu is dat total_loss maar geen idee of dit goed is  
 
 
 if __name__ == '__main__':
