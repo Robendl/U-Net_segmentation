@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from augmentations import *
 from network import *
+from cross_validation import *
 
 
 class ImageDataset(Dataset):
@@ -94,6 +95,7 @@ def main():
     model = model.cuda()
 
     #model = load_path(model, "results/simclr.pth")
+    #splits = cross_validation(validation=validation, features=data, labels=labels)
 
     train_indices = list(range(0,2450))
     valid_indices = list(range(0,307))
