@@ -1,19 +1,20 @@
 import numpy as np
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split
 
 
-def cross_validation(features, labels):
-    X=features
-    y=labels
-    n_splits=4
-    kf = StratifiedKFold(n_splits=n_splits)
-    splits = []
 
-    for train_index, test_index in kf.split(X, y):
-        train_index = train_index.tolist()
-        test_index = test_index.tolist()
-        dataloader_trainset, dataloader_valset = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-        splits.append((dataloader_trainset, dataloader_valset, y_train, y_test))
-
-    return splits    
+def cross_validation(validation, features, labels):
+    if validation == "8020":
+        X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
+        splits = []
+        splits.append((X_train, X_test, y_train, y_test))
+    elif validation == "k_3fold":
+        splits = k_fold_validation(X=features, y=labels, n_splits=3)
+    elif validation == "k_5fold":
+        splits = k_fold_validation(X=features, y=labels, n_splits=5)
+    elif validation == "k_7fold":
+        splits = k_fold_validation(X=features, y=labels, n_splits=7)
+    else:
+        raise Exception("Validation method not imported")    
+    
+    return splits
