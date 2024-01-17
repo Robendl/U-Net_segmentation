@@ -125,21 +125,23 @@ def main():
     dataloader_dataset = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
     X=dataloader_dataset
+    y=labels # Wat is dit, of kan dit losgelaten worden en labels uitgelezen zoals bij 155?
     n_splits=4
     kf = StratifiedKFold(n_splits=n_splits)
     splits = []
 
-    for train_index, test_index in kf.split(range(image_indices)):
+    for train_index, test_index in kf.split(X, y):
         train_index = train_index.tolist()
         test_index = test_index.tolist()
         dataloader_trainset, dataloader_valset = X.iloc[train_index], X.iloc[test_index]
-        splits.append((dataloader_trainset, dataloader_valset))
+        y_train, y_test = y.iloc[train_index], y.iloc[test_index] # nogmaals, y is dus een vraagteken 
+        splits.append((dataloader_trainset, dataloader_valset, y_train, y_test))
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
 
     split_counter = 0
     scores = []
-    for (dataloader_trainset, dataloader_valset) in splits: #Iteration over de CV voor het aantal splits (staat op 4)
+    for (dataloader_trainset, dataloader_valset, y_train, y_test) in splits: #Iteration over de CV voor het aantal splits (staat op 4)
         print("Split: ", split_counter)
 
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
