@@ -52,6 +52,7 @@ def dice_loss(y_pred, y_true):
     dice = (2. * intersection + smooth) / (sum_ + smooth)
     return 1. - dice
 
+
 def validate(dataloader_valset, model):
     model.eval()
     bce_loss = nn.BCEWithLogitsLoss()
@@ -89,6 +90,7 @@ def load_path(model, path):
     print("model after", model.state_dict()['unet.down1.conv.0.weight'][0][0][0])
     return model
 
+
 def main():
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
@@ -116,7 +118,6 @@ def main():
     valid_dataset = ImageDataset(valid_indices, valid_image_indices)
     dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
-
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
                                                                             last_epoch=-1)
@@ -140,7 +141,6 @@ def main():
             optimizer.step()
             batch_counter += 1
             total_loss += loss.item()
-
 
         valid_loss = validate(dataloader_valset, model)
 
