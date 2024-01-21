@@ -12,6 +12,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
     def __init__(self, learning_rate, batch_size, loss_function):
         # Initialize your wrapper with hyperparameters
         self.model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
+        self.model.cuda()
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.loss_function = loss_function
@@ -28,9 +29,9 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
 def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
-        'learning_rate': [0.001, 0.0001, 0.00001],
-        'batch_size': [24, 16, 8],
-        'loss_function': [bce_loss, dice_loss, combined_loss]  # Include different loss functions
+        'learning_rate': [0.001],
+        'batch_size': [24],
+        'loss_function': [bce_loss]
     }
 
     # Create an instance of the PyTorch wrapper
