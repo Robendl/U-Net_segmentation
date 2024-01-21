@@ -21,6 +21,10 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         num_epochs = 1
         # train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
+    def predict(self, x):
+        print("predict")
+        return [0,1]
+
     def score(self, X, y, sample_weight=None):
         return 1 # test(self.model, X)
 
