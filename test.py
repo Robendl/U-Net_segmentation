@@ -15,12 +15,13 @@ class ImageDataset(Dataset):
         return len(self.indices)
 
     def __getitem__(self, idx):
+        img_number =  self.indices[idx]
         #Load image
-        image_path = "brain_tumour/images/" + str(idx) + ".png"
+        image_path = "brain_tumour/images/" + str(img_number) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         #Load label
-        label_path = "brain_tumour/masks/" + str(idx) + ".png"
+        label_path = "brain_tumour/masks/" + str(img_number) + ".png"
         label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE) 
 
         image = cv2.resize(image, (512, 512))
@@ -64,17 +65,17 @@ def test(model, image_indices):
             score = f1_score(output_binary, label)
             total_f1_score = total_f1_score + score
 
-            output_binary = output_binary.squeeze()  
-            output_binary = output_binary.detach().cpu().numpy()
-            output_image = Image.fromarray((output_binary * 255).astype(np.uint8))
-            output_image = output_image.convert("L")
-            output_image.save('results/tensor_image' + str(idx) + '.png')
+            # output_binary = output_binary.squeeze()
+            # output_binary = output_binary.detach().cpu().numpy()
+            # output_image = Image.fromarray((output_binary * 255).astype(np.uint8))
+            # output_image = output_image.convert("L")
+            # output_image.save('results/tensor_image' + str(idx) + '.png')
 
-            label_binary = label.squeeze()  
-            label_binary = label_binary.detach().cpu().numpy()
-            output_image = Image.fromarray((label_binary * 255).astype(np.uint8))
-            output_image = output_image.convert("L")
-            output_image.save('results/mask' + str(idx) + '.png')
+            # label_binary = label.squeeze()
+            # label_binary = label_binary.detach().cpu().numpy()
+            # output_image = Image.fromarray((label_binary * 255).astype(np.uint8))
+            # output_image = output_image.convert("L")
+            # output_image.save('results/mask' + str(idx) + '.png')
 
     total_f1_score = total_f1_score / 307
 
