@@ -1,58 +1,60 @@
-import torch
-import torch.nn as nn
+import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.metrics import accuracy_score
-from network import UNet
+from network import UNet, UnetWithHeader
+from unet import bce_loss, dice_loss, combined_loss
+
+from unet import train
+from test import test
+
 
 class PyTorchWrapper(BaseEstimator, ClassifierMixin):
-    def __init__(self, hyperparameter1, hyperparameter2, loss_function):
+    def __init__(self, learning_rate, batch_size, loss_function):
         # Initialize your wrapper with hyperparameters
-        self.hyperparameter1 = hyperparameter1
-        self.hyperparameter2 = hyperparameter2
+        self.model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
         self.loss_function = loss_function
 
     def fit(self, X, y):
-        # Instantiate and train your PyTorch model here using the provided hyperparameters
-        self.model = UNet(self.hyperparameter1, self.hyperparameter2)
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.hyperparameter1)
+        print(self.batch_size, self.learning_rate, np.size(X))
+        num_epochs = 1
+        # train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
-        criterion = self.loss_function  # Use the provided loss function
+    def score(self, X, y, sample_weight=None):
+        return 1 # test(self.model, X)
 
-        # ... training logic using X and y ...
-        # Example training loop:
-        for epoch in range(num_epochs):
-            # Forward pass, backward pass, and optimization steps
-            # ...
 
-    def predict(self, X):
-        # Make predictions using your trained model
-        # ...
+def gridsearch():
+    # Create a hyperparameter grid to search
+    param_grid = {
+        'learning_rate': [0.001, 0.0001, 0.00001],
+        'batch_size': [24, 16, 8],
+        'loss_function': [bce_loss, dice_loss, combined_loss]  # Include different loss functions
+    }
 
-    def score(self, X, y):
-        # Evaluate the performance of your model using a scoring metric (e.g., accuracy)
-        y_pred = self.predict(X)
-        return accuracy_score(y, y_pred)
+    # Create an instance of the PyTorch wrapper
+    pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
 
-# Create a hyperparameter grid to search
-param_grid = {
-    'hyperparameter1': [value1, value2],
-    'hyperparameter2': [value3, value4],
-    'loss_function': [nn.CrossEntropyLoss(), nn.BCELoss()]  # Include different loss functions
-}
+    # Use GridSearchCV with your PyTorch wrapper
+    grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=5)
+    train_image_indices = list(range(0,2757))
+    train_label_indices = list(range(0,2757))
+    grid_search.fit(train_image_indices, train_label_indices)
 
-# Create an instance of the PyTorch wrapper
-pytorch_wrapper = PyTorchWrapper()
+    # Access the best hyperparameters
+    best_hyperparameters = grid_search.best_params_
+    print(best_hyperparameters)
 
-# Use GridSearchCV with your PyTorch wrapper
-grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=5)
-grid_search.fit(X_train, y_train)
+    # Access the best trained model
+    best_model = grid_search.best_estimator_
 
-# Access the best hyperparameters
-best_hyperparameters = grid_search.best_params_
+    # Evaluate the best model on the test set
+    test_image_indices = list(range(0,307))
+    test_label_indices = list(range(0,307))
+    test_score = best_model.score(test_image_indices, test_label_indices)
+    print("Best test score:", test_score)
 
-# Access the best trained model
-best_model = grid_search.best_estimator_
 
-# Evaluate the best model on the test set
-test_score = best_model.score(X_test, y_test)
+if __name__ == '__main__':
+    gridsearch()

@@ -101,13 +101,26 @@ def load_path(model, path):
     return model
 
 
-def train(model, image_indices, loss_function=combined_loss, learning_rate=0.00001, batch_size=8, num_epochs=30):
+def train(model, loss_function=combined_loss, learning_rate=0.00001, batch_size=8, num_epochs=30):
+    train_indices = list(range(0,2450))
+    valid_indices = list(range(0,307))
+
+    image_indices = list(range(0,2757))
     random.shuffle(image_indices)
 
-    train_dataset = ImageDataset(image_indices, image_indices, True)
+    train_image_indices = image_indices[0:2450]
+    valid_image_indices = image_indices[2450:2757]
+
+    best_valid_loss = np.Inf
+
+    train_dataset = ImageDataset(train_indices, train_image_indices, True)
     dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
+    valid_dataset = ImageDataset(valid_indices, valid_image_indices)
+    dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0, last_epoch=-1)
 
     for epoch in range(num_epochs):
         model.train()
@@ -127,10 +140,18 @@ def train(model, image_indices, loss_function=combined_loss, learning_rate=0.000
             batch_counter += 1
             total_loss += loss.item()
 
+        valid_loss = validate(dataloader_valset, model, loss_function)
+
+        if valid_loss < best_valid_loss:
+            best_valid_loss = valid_loss
+            save_file = "results/unet.pth" 
+            save_model(model, save_file)
+
         total_loss /= batch_counter
 
         print("EPOCH: ", int(epoch))
         print("train loss", total_loss)
+        print("valid loss", valid_loss)
 
 
 if __name__ == '__main__':

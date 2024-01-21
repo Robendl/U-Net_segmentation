@@ -46,14 +46,8 @@ def f1_score(predicted, mask):
     return F1.item()  # convert tensor to scalar value
 
 
-def main():
+def test(model, image_indices):
     total_f1_score = 0
-    model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
-    model = model.cuda()
-
-    state_dict = torch.load("results/unet.pth", map_location=torch.device('cuda:0'))
-    model.load_state_dict(state_dict, strict=True)
-    image_indices = list(range(0,307))
 
     test = ImageDataset(image_indices)
     test_set = DataLoader(test, batch_size=1, shuffle=True, num_workers=4)
@@ -85,7 +79,14 @@ def main():
     total_f1_score = total_f1_score / 307
 
     print("mean f1 score", total_f1_score)
+    return total_f1_score
 
 
 if __name__ == '__main__':
-    main()
+    model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
+    model = model.cuda()
+
+    state_dict = torch.load("results/unet.pth", map_location=torch.device('cuda:0'))
+    model.load_state_dict(state_dict, strict=True)
+    image_indices = list(range(0, 307))
+    test(model, image_indices)
