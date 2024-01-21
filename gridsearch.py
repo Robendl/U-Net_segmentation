@@ -40,21 +40,23 @@ def gridsearch():
     # Use GridSearchCV with your PyTorch wrapper
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
-    train_image_indices = list(range(0,2757))
-    train_label_indices = list(range(0,2757))
-    grid_search.fit(train_image_indices, train_label_indices)
+
+    total_images = 3064
+    indices = np.arange(1, total_images + 1)
+    np.random.shuffle(indices)
+    train_size = int(total_images * 0.9)
+    train_indices = indices[:train_size]
+    test_indices = indices[train_size:]
+
+    grid_search.fit(train_indices, train_indices)
 
     # Access the best hyperparameters
     best_hyperparameters = grid_search.best_params_
     print(best_hyperparameters)
 
-    # Access the best trained model
     best_model = grid_search.best_estimator_
 
-    # Evaluate the best model on the test set
-    test_image_indices = list(range(0,307))
-    test_label_indices = list(range(0,307))
-    test_score = best_model.score(test_image_indices, test_label_indices)
+    test_score = best_model.score(test_indices, test_indices)
     print("Best test score:", test_score)
 
 

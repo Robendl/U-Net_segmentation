@@ -49,8 +49,8 @@ def f1_score(predicted, mask):
 def test(model, image_indices):
     total_f1_score = 0
 
-    test = ImageDataset(image_indices)
-    test_set = DataLoader(test, batch_size=1, shuffle=True, num_workers=4)
+    test_images = ImageDataset(image_indices)
+    test_set = DataLoader(test_images, batch_size=1, shuffle=True, num_workers=4)
 
     for idx, (image, label) in enumerate(test_set):
         with torch.no_grad():
