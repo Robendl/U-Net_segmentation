@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=32GB
 #SBATCH --job-name=unet
-#SBATCH --output=unet.out
+#SBATCH --output=gridsearch.out
 
 
 source /home3/s3799174/machinelearning/venv/bin/activate
