@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.base import BaseEstimator, ClassifierMixin
 from network import UNet, UnetWithHeader
 from unet import bce_loss, dice_loss, combined_loss
@@ -37,7 +37,8 @@ def gridsearch():
     pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
 
     # Use GridSearchCV with your PyTorch wrapper
-    grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=5)
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
     train_image_indices = list(range(0,2757))
     train_label_indices = list(range(0,2757))
     grid_search.fit(train_image_indices, train_label_indices)
