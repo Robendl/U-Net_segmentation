@@ -17,16 +17,12 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.loss_function = loss_function
 
     def fit(self, X, y):
-        print(self.batch_size, self.learning_rate, np.size(X))
+        print(self.batch_size, self.learning_rate, self.loss_function.__name__)
         num_epochs = 1
-        # train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
-
-    def predict(self, x):
-        print("predict")
-        return [0,1]
+        train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
     def score(self, X, y, sample_weight=None):
-        return 1 # test(self.model, X)
+        return test(self.model, X)
 
 
 def gridsearch():
