@@ -33,6 +33,11 @@ def gridsearch():
         'batch_size': [20, 16, 12],
         'loss_function': [bce_loss, dice_loss, combined_loss]
     }
+    param_grid = {
+        'learning_rate': [0.001],
+        'batch_size': [8],
+        'loss_function': [bce_loss]
+    }
 
     # Create an instance of the PyTorch wrapper
     pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
