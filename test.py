@@ -61,8 +61,8 @@ def test(model, image_indices):
             label = label.float().to('cuda')
             
             output_binary = (output > 0.5).float()
-
             score = f1_score(output_binary, label)
+            print(score)
             total_f1_score = total_f1_score + score
 
             # output_binary = output_binary.squeeze()

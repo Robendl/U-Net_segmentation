@@ -18,7 +18,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.loss_function = loss_function
 
     def fit(self, X, y):
-        num_epochs = 10
+        num_epochs = 1
         print(self.batch_size, self.learning_rate, self.loss_function.__name__)
         train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
@@ -44,7 +44,7 @@ def gridsearch():
     total_images = 3064
     indices = np.arange(1, total_images + 1)
     np.random.shuffle(indices)
-    data_used = 1000
+    data_used = 100
     indices = indices[:data_used]
     train_size = int(data_used * 0.9)
     train_indices = indices[:train_size]
