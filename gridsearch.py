@@ -30,7 +30,7 @@ def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
         'learning_rate': [0.001],
-        'batch_size': [24],
+        'batch_size': [20],
         'loss_function': [bce_loss]
     }
 
