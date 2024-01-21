@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --time=0-3:00:00
+#SBATCH --time=0-13:00:00
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
-#SBATCH --mem=64GB
+#SBATCH --mem=32GB
 #SBATCH --job-name=gridsearch
 #SBATCH --output=gridsearch.out
 
