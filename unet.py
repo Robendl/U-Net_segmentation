@@ -130,6 +130,7 @@ def train(model, image_indices, learning_rate=0.00001, batch_size=8, loss_functi
         total_loss /= batch_counter
 
         print("EPOCH: ", int(epoch))
+        print(batch_size, learning_rate, loss_function.__name__)
         print("train loss", total_loss)
 
 

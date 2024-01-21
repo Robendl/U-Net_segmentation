@@ -19,7 +19,6 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y):
         num_epochs = 1
-        print(self.batch_size, self.learning_rate, self.loss_function.__name__)
         train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
     def score(self, X, y, sample_weight=None):
@@ -30,14 +29,14 @@ def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
         'learning_rate': [0.001, 0.0001, 0.00001],
-        'batch_size': [20, 16, 12],
+        'batch_size': [12],
         'loss_function': [bce_loss, dice_loss, combined_loss]
     }
-    param_grid = {
-        'learning_rate': [0.001],
-        'batch_size': [8],
-        'loss_function': [bce_loss]
-    }
+    # param_grid = {
+    #     'learning_rate': [0.001],
+    #     'batch_size': [8],
+    #     'loss_function': [bce_loss]
+    # }
 
     # Create an instance of the PyTorch wrapper
     pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
