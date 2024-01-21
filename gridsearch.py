@@ -18,8 +18,8 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.loss_function = loss_function
 
     def fit(self, X, y):
+        num_epochs = 10
         print(self.batch_size, self.learning_rate, self.loss_function.__name__)
-        num_epochs = 1
         train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
     def score(self, X, y, sample_weight=None):
@@ -29,9 +29,9 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
 def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
-        'learning_rate': [0.001],
-        'batch_size': [8],
-        'loss_function': [bce_loss]
+        'learning_rate': [0.001, 0.0001, 0.00001],
+        'batch_size': [20, 16, 12],
+        'loss_function': [bce_loss, dice_loss, combined_loss]
     }
 
     # Create an instance of the PyTorch wrapper
@@ -41,10 +41,12 @@ def gridsearch():
     kf = KFold(n_splits=3, shuffle=True, random_state=42)
     grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
 
-    total_images = 500
+    total_images = 3064
     indices = np.arange(1, total_images + 1)
     np.random.shuffle(indices)
-    train_size = int(total_images * 0.9)
+    data_used = 1000
+    indices = indices[:data_used]
+    train_size = int(data_used * 0.9)
     train_indices = indices[:train_size]
     test_indices = indices[train_size:]
 

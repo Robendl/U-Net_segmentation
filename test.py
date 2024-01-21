@@ -77,9 +77,9 @@ def test(model, image_indices):
             # output_image = output_image.convert("L")
             # output_image.save('results/mask' + str(idx) + '.png')
 
-    total_f1_score = total_f1_score / 307
+    total_f1_score = total_f1_score / len(image_indices)
 
-    print("mean f1 score", total_f1_score)
+    print("Mean f1 score:", total_f1_score)
     return total_f1_score
 
 
