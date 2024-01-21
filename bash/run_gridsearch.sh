@@ -5,8 +5,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
 #SBATCH --mem=32GB
-#SBATCH --job-name=test
-#SBATCH --output=test.out
+#SBATCH --job-name=gridsearch
+#SBATCH --output=gridsearch.out
 
 source /home3/s3799174/machinelearning/venv/bin/activate
 
