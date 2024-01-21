@@ -4,8 +4,8 @@
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
-#SBATCH --mem=32GB
-#SBATCH --job-name=unet
+#SBATCH --mem=64GB
+#SBATCH --job-name=gridsearch
 #SBATCH --output=gridsearch.out
 
 

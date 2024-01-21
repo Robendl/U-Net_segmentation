@@ -38,7 +38,7 @@ def gridsearch():
     pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
 
     # Use GridSearchCV with your PyTorch wrapper
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=3, shuffle=True, random_state=42)
     grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
 
     total_images = 3064

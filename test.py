@@ -16,11 +16,11 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         #Load image
-        image_path = "brain_tumour/test/images/" + str(idx) + ".png"
+        image_path = "brain_tumour/images/" + str(idx) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         #Load label
-        label_path = "brain_tumour/test/masks/" + str(idx) + ".png"
+        label_path = "brain_tumour/masks/" + str(idx) + ".png"
         label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE) 
 
         image = cv2.resize(image, (512, 512))
