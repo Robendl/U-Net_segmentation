@@ -101,7 +101,7 @@ def load_path(model, path):
     return model
 
 
-def train(model, image_indices, loss_function=combined_loss, learning_rate=0.00001, batch_size=8, num_epochs=30):
+def train(model, image_indices, learning_rate=0.00001, batch_size=8, loss_function=combined_loss, num_epochs=30):
     random.shuffle(image_indices)
 
     train_dataset = ImageDataset(image_indices, image_indices, True)
@@ -136,4 +136,5 @@ def train(model, image_indices, loss_function=combined_loss, learning_rate=0.000
 if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
-    train(model)
+    image_indices = list(range(0,2757))
+    train(model, image_indices)
