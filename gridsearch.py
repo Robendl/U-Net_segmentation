@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.base import BaseEstimator, ClassifierMixin
-from network import UNet, UnetWithHeader
+from network import UnetWithHeader
 from unet import bce_loss, dice_loss, combined_loss
 
 from unet import train
@@ -18,7 +18,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.loss_function = loss_function
 
     def fit(self, X, y):
-        num_epochs = 1
+        num_epochs = 15
         train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
 
     def score(self, X, y, sample_weight=None):
@@ -48,7 +48,7 @@ def gridsearch():
     total_images = 3064
     indices = np.arange(1, total_images + 1)
     np.random.shuffle(indices)
-    data_used = 100
+    data_used = 1000
     indices = indices[:data_used]
     train_size = int(data_used * 0.9)
     train_indices = indices[:train_size]
