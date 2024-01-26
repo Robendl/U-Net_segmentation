@@ -45,8 +45,8 @@ def gridsearch():
     kf = KFold(n_splits=3, shuffle=True, random_state=42)
     grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
 
-    total_images = 3064
-    indices = np.arange(1, total_images + 1)
+    total_images = 2757
+    indices = np.arange(0, total_images)
     np.random.shuffle(indices)
     data_used = 1000
     indices = indices[:data_used]
