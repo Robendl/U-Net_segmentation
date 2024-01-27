@@ -39,7 +39,7 @@ def gridsearch():
     # }
 
     # Create an instance of the PyTorch wrapper
-    pytorch_wrapper = PyTorchWrapper(0.001, "mls", bce_loss)
+    pytorch_wrapper = PyTorchWrapper(0.001, "cls", bce_loss)
 
     # Use GridSearchCV with your PyTorch wrapper
     kf = KFold(n_splits=3, shuffle=True, random_state=42)
