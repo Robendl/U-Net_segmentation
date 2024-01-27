@@ -9,17 +9,17 @@ from test import test
 
 
 class PyTorchWrapper(BaseEstimator, ClassifierMixin):
-    def __init__(self, learning_rate, batch_size, loss_function):
+    def __init__(self, learning_rate, mode, loss_function):
         # Initialize your wrapper with hyperparameters
-        self.model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
+        self.model = UnetWithHeader(n_channels=3, n_classes=1, mode=mode)
         self.model.cuda()
-        self.batch_size = batch_size
+        self.mode = mode
         self.learning_rate = learning_rate
         self.loss_function = loss_function
 
     def fit(self, X, y):
         num_epochs = 15
-        train(self.model, X, self.learning_rate, self.batch_size, self.loss_function, num_epochs)
+        train(self.model, X, learning_rate=self.learning_rate, loss_function=self.loss_function, num_epochs=num_epochs)
 
     def score(self, X, y, sample_weight=None):
         return test(self.model, X)
@@ -29,7 +29,7 @@ def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
         'learning_rate': [0.001, 0.0001, 0.00001],
-        'batch_size': [16, 8],
+        'mode': ["cls", "mlp"],
         'loss_function': [bce_loss, dice_loss, combined_loss]
     }
     # param_grid = {
@@ -39,7 +39,7 @@ def gridsearch():
     # }
 
     # Create an instance of the PyTorch wrapper
-    pytorch_wrapper = PyTorchWrapper(0.001, 24, bce_loss)
+    pytorch_wrapper = PyTorchWrapper(0.001, "mls", bce_loss)
 
     # Use GridSearchCV with your PyTorch wrapper
     kf = KFold(n_splits=3, shuffle=True, random_state=42)

@@ -101,7 +101,7 @@ def load_path(model, path):
     return model
 
 
-def train(model, image_indices, learning_rate=0.00001, batch_size=8, loss_function=combined_loss, num_epochs=30):
+def train(model, image_indices, learning_rate=0.00001, loss_function=combined_loss, num_epochs=30, batch_size=8):
     random.shuffle(image_indices)
 
     train_dataset = ImageDataset(image_indices, image_indices, True)
