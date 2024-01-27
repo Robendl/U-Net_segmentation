@@ -19,6 +19,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y):
         num_epochs = 15
+        print(self.learning_rate, self.loss_function.__name__, self.mode)
         train(self.model, X, learning_rate=self.learning_rate, loss_function=self.loss_function, num_epochs=num_epochs)
 
     def score(self, X, y, sample_weight=None):
