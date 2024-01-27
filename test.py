@@ -8,20 +8,21 @@ from network import *
 
 
 class ImageDataset(Dataset):
-    def __init__(self, indices):
+    def __init__(self, indices, path):
+        self.path = path
         self.indices = indices
 
     def __len__(self):
         return len(self.indices)
 
     def __getitem__(self, idx):
-        img_number =  self.indices[idx]
+        img_number = self.indices[idx]
         #Load image
-        image_path = "brain_tumour/train/images/" + str(img_number) + ".png"
+        image_path = self.path + "/images/" + str(img_number) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         #Load label
-        label_path = "brain_tumour/train/masks/" + str(img_number) + ".png"
+        label_path = self.path + "/masks/" + str(img_number) + ".png"
         label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE) 
 
         image = cv2.resize(image, (512, 512))
@@ -47,10 +48,10 @@ def f1_score(predicted, mask):
     return F1.item()  # convert tensor to scalar value
 
 
-def test(model, image_indices):
+def test(model, image_indices, path):
     total_f1_score = 0
 
-    test_images = ImageDataset(image_indices)
+    test_images = ImageDataset(image_indices, path)
     test_set = DataLoader(test_images, batch_size=1, shuffle=True, num_workers=4)
 
     for idx, (image, label) in enumerate(test_set):
@@ -90,4 +91,5 @@ if __name__ == '__main__':
     state_dict = torch.load("results/unet.pth", map_location=torch.device('cuda:0'))
     model.load_state_dict(state_dict, strict=True)
     image_indices = list(range(0, 307))
-    test(model, image_indices)
+    path = "brain_tumour/test"
+    test(model, image_indices, path)

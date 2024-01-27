@@ -16,6 +16,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.mode = mode
         self.learning_rate = learning_rate
         self.loss_function = loss_function
+        self.path = "brain_tumour/train"
 
     def fit(self, X, y):
         num_epochs = 15
@@ -23,7 +24,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         train(self.model, X, learning_rate=self.learning_rate, loss_function=self.loss_function, num_epochs=num_epochs)
 
     def score(self, X, y, sample_weight=None):
-        return test(self.model, X)
+        return test(self.model, X, self.path)
 
 
 def gridsearch():
