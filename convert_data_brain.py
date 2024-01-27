@@ -21,6 +21,7 @@ def convert_data_brain():
 
     # Generate random indices for 90% train and 10% test
     indices = np.arange(1, total_images + 1)
+    np.random.seed(42)
     np.random.shuffle(indices)
     train_size = int(total_images * 0.9)
     train_indices = indices[:train_size]
