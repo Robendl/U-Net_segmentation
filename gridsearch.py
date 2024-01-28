@@ -19,7 +19,7 @@ class PyTorchWrapper(BaseEstimator, ClassifierMixin):
         self.path = "brain_tumour/train"
 
     def fit(self, X, y):
-        num_epochs = 15
+        num_epochs = 25
         print(self.learning_rate, self.loss_function.__name__, self.mode)
         train(self.model, X, learning_rate=self.learning_rate, loss_function=self.loss_function, num_epochs=num_epochs)
 
@@ -31,7 +31,7 @@ def gridsearch():
     # Create a hyperparameter grid to search
     param_grid = {
         'learning_rate': [0.001, 0.0001, 0.00001],
-        'mode': ["mlp"],
+        'mode': ["mlp", "cls"],
         'loss_function': [bce_loss, dice_loss, combined_loss]
     }
 
@@ -39,13 +39,13 @@ def gridsearch():
     pytorch_wrapper = PyTorchWrapper(0.001, "mlp", bce_loss)
 
     # Use GridSearchCV with your PyTorch wrapper
-    kf = KFold(n_splits=3, shuffle=True, random_state=42)
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
     grid_search = GridSearchCV(pytorch_wrapper, param_grid, cv=kf)
 
     total_images = 2757
     indices = np.arange(0, total_images)
     np.random.shuffle(indices)
-    data_used = 1000
+    data_used = 2757
     indices = indices[:data_used]
     train_size = int(data_used * 0.9)
     train_indices = indices[:train_size]
