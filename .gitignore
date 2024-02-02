@@ -2,3 +2,5 @@ data
 brain_tumour
 venv
 unet.pth
+
+__pycache__
