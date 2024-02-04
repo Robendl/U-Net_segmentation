@@ -4,3 +4,4 @@ venv
 unet.pth
 
 __pycache__
+.idea
