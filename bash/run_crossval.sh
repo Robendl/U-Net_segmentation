@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --time=2-03:30:00
+#SBATCH --time=0-12:00:00
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
 #SBATCH --mem=32GB
-#SBATCH --job-name=unet
-#SBATCH --output=unet.out
+#SBATCH --job-name=unet_cv
+#SBATCH --output=unet_cv.out
 
 
 source /home3/s3799174/machinelearning/venv/bin/activate
