@@ -136,6 +136,8 @@ def main():
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
                                                                                 last_epoch=-1)
 
+        training_losses = []
+        validation_losses = []
         for epoch in range(num_epochs):
             model.train()
             total_loss = 0.0
@@ -148,7 +150,7 @@ def main():
                 output = model(images.float().to('cuda'))
                 labels = labels.float().to('cuda')
                 output_sigmoid = torch.sigmoid(output)
-                    
+
                 loss = dice_loss(output_sigmoid.squeeze(), labels) + bce_loss(output.squeeze(), labels)
 
                 loss.backward()
@@ -161,14 +163,19 @@ def main():
 
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                save_file = "results/unetmlp" + str(fold) + ".pth" 
+                save_file = "results/unetmlp" + str(fold) + ".pth"
                 save_model(model, save_file)
 
             total_loss /= batch_counter
 
             print("EPOCH: ", int(epoch))
             print("train loss", total_loss)
+            training_losses.append(total_loss)
             print("valid loss", valid_loss)
+            validation_losses.append(valid_loss)
+        np.save(f'training-loss{fold}', training_losses)
+        np.save(f'validation-loss{fold}', validation_losses)
+        return
 
 
 if __name__ == '__main__':
