@@ -118,8 +118,8 @@ def main():
 
     for fold, (train_image_indices, valid_image_indices) in enumerate(kf.split(image_indices)):
         print("Training fold: ", fold)
-        # if fold==0:
-        #     continue
+        if fold==0:
+            continue
         best_valid_loss = np.Inf
 
         #Reset all weight parameters when training with a new fold
