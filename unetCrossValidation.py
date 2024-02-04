@@ -57,7 +57,7 @@ def validate(dataloader_valset, model):
     model.eval()
     bce_loss = nn.BCEWithLogitsLoss()
     # validation steps
-    with torch.no_grad():
+    with torch.no_grgiad():
 
         valid_loss = 0.0
         counter = 0
