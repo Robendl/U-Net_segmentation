@@ -99,69 +99,7 @@ def threshold():
     print(f'Average F1 Score: {np.mean(f1_scores):.4f}, Standard Deviation: {np.std(f1_scores):.4f}')
     print(f'Average IoU Score: {np.mean(iou_scores):.4f}, Standard Deviation: {np.std(iou_scores):.4f}')
 
+
 if __name__ == '__main__':
     threshold()
-    # image_path = "brain_tumour/train/images/451.png"
-    # image = io.imread(image_path)
-        
-    # # Convert to grayscale if needed
-    # if len(image.shape) == 3:
-    #     image = color.rgb2gray(image)
-            
-    # # Normalize the image and apply threshold
-    # image_normalized = image / 255.0
-    
-    ## multi_otsu plot
-    # thresholds = threshold_multiotsu(image_normalized)
-    # optimal_threshold = thresholds[len(thresholds) // 2]
-    # binary_mask = (image_normalized > optimal_threshold).astype(np.uint8)
-    # thresholds = threshold_multiotsu(image)
-
-    # # Using the threshold values, we generate the three regions.
-    # regions = np.digitize(image, bins=thresholds)
-
-    # fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(10, 3.5))
-    # ax[0].imshow(image, cmap='gray')
-    # ax[0].set_title('Original')
-    # ax[0].axis('off')
-
-    # # Plotting the histogram and the two thresholds obtained from
-    # # multi-Otsu.
-    # ax[1].hist(image.ravel(), bins=255)
-    # ax[1].set_title('Histogram')
-    # for thresh in thresholds:
-    #     ax[1].axvline(thresh, color='r')
-
-    # # Plotting the Multi Otsu result.
-    # ax[2].imshow(regions, cmap='jet')
-    # ax[2].set_title('Multi-Otsu result')
-    # ax[2].axis('off')
-
-    # plt.subplots_adjust()
-
-    # plt.show()
-
-    ## otsu plot
-    # thresh = threshold_otsu(image)
-    # binary = image > thresh
-
-    # fig, axes = plt.subplots(ncols=3, figsize=(8, 2.5))
-    # ax = axes.ravel()
-    # ax[0] = plt.subplot(1, 3, 1)
-    # ax[1] = plt.subplot(1, 3, 2)
-    # ax[2] = plt.subplot(1, 3, 3, sharex=ax[0], sharey=ax[0])
-
-    # ax[0].imshow(image, cmap=plt.cm.gray)
-    # ax[0].set_title('Original')
-    # ax[0].axis('off')
-
-    # ax[1].hist(image.ravel(), bins=256)
-    # ax[1].set_title('Histogram')
-    # ax[1].axvline(thresh, color='r')
-
-    # ax[2].imshow(binary, cmap=plt.cm.gray)
-    # ax[2].set_title('Thresholded')
-    # ax[2].axis('off')
-
-    # plt.show()
     

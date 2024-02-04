@@ -99,15 +99,7 @@ def main():
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
 
-    #model = load_path(model, "results/simclr.pth")
-
-    # train_indices = list(range(0,2450))
-    # valid_indices = list(range(0,307))
-
     image_indices = list(range(0,2757))
-
-    # train_image_indices = image_indices[0:2450]
-    # valid_image_indices = image_indices[2450:2757]
 
     num_epochs = 30
     batch_size = 8
@@ -124,9 +116,6 @@ def main():
 
         #Reset all weight parameters when training with a new fold
         model.apply(weight_reset)
-
-        # for name, param in model.named_parameters():
-        #     print(name, param.data)
 
         train_dataset = ImageDataset(list(range(0,len(train_image_indices))), train_image_indices, True)
         dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)

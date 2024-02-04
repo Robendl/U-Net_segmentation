@@ -66,18 +66,6 @@ def test(model, image_indices, path):
             print(score)
             total_f1_score = total_f1_score + score
 
-            # output_binary = output_binary.squeeze()
-            # output_binary = output_binary.detach().cpu().numpy()
-            # output_image = Image.fromarray((output_binary * 255).astype(np.uint8))
-            # output_image = output_image.convert("L")
-            # output_image.save('results/tensor_image' + str(idx) + '.png')
-
-            # label_binary = label.squeeze()
-            # label_binary = label_binary.detach().cpu().numpy()
-            # output_image = Image.fromarray((label_binary * 255).astype(np.uint8))
-            # output_image = output_image.convert("L")
-            # output_image.save('results/mask' + str(idx) + '.png')
-
     total_f1_score = total_f1_score / len(image_indices)
 
     print("Mean f1 score:", total_f1_score)

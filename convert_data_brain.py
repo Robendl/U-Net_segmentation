@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-from create_mask import create_mask
+from crop_and_resize import crop_and_resize
 
 
 def convert_data_brain():
@@ -31,14 +31,14 @@ def convert_data_brain():
     for new_idx, idx in enumerate(train_indices):
         image_path = os.path.join(dir_train_imgs, str(new_idx) + ".png")
         label_path = os.path.join(dir_train_labels, str(new_idx) + ".png")
-        resized_image, resized_label = create_mask(f'brain_tumour/images/{idx}.png', f'brain_tumour/masks/{idx}.png')
+        resized_image, resized_label = crop_and_resize(f'brain_tumour/images/{idx}.png', f'brain_tumour/masks/{idx}.png')
         cv2.imwrite(image_path, resized_image)
         cv2.imwrite(label_path, resized_label)
 
     for new_idx, idx in enumerate(test_indices):
         image_path = os.path.join(dir_test_imgs, str(new_idx) + ".png")
         label_path = os.path.join(dir_test_labels, str(new_idx) + ".png")
-        resized_image, resized_label = create_mask(f'brain_tumour/images/{idx}.png', f'brain_tumour/masks/{idx}.png')
+        resized_image, resized_label = crop_and_resize(f'brain_tumour/images/{idx}.png', f'brain_tumour/masks/{idx}.png')
         cv2.imwrite(image_path, resized_image)
         cv2.imwrite(label_path, resized_label)
 
