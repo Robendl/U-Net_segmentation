@@ -103,7 +103,7 @@ def main():
 
     num_epochs = 30
     batch_size = 8
-    learning_rate = 0.00001
+    learning_rate = 1e-4
     best_valid_loss = np.Inf
     bce_loss = nn.BCEWithLogitsLoss()
 
