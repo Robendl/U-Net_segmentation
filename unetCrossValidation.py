@@ -67,8 +67,9 @@ def validate(dataloader_valset, model):
             output = model(images.float().to('cuda'))
             output_sigmoid = torch.sigmoid(output)
             labels = labels.float().to('cuda')
-                
-            loss = dice_loss(output_sigmoid.squeeze(), labels) + bce_loss(output.squeeze(), labels)
+            
+
+            loss = dice_loss(output_sigmoid.squeeze(dim=1), labels) + bce_loss(output.squeeze(dim=1), labels)
             valid_loss += loss.item()
             counter += 1
             
@@ -94,7 +95,7 @@ def load_path(model, path):
     return model
 
 def main():
-    kf = KFold(n_splits=4, shuffle=True, random_state=42)
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
 
@@ -108,7 +109,7 @@ def main():
     # train_image_indices = image_indices[0:2450]
     # valid_image_indices = image_indices[2450:2757]
 
-    num_epochs = 10
+    num_epochs = 30
     batch_size = 8
     learning_rate = 0.00001
     best_valid_loss = np.Inf
@@ -117,6 +118,7 @@ def main():
 
     for fold, (train_image_indices, valid_image_indices) in enumerate(kf.split(image_indices)):
         print("Training fold: ", fold)
+        best_valid_loss = np.Inf
 
         #Reset all weight parameters when training with a new fold
         model.apply(weight_reset)
@@ -159,7 +161,7 @@ def main():
 
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                save_file = "results/unet" + str(fold) + ".pth" 
+                save_file = "results/unetmlp" + str(fold) + ".pth" 
                 save_model(model, save_file)
 
             total_loss /= batch_counter
