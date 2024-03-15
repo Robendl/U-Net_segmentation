@@ -7,6 +7,20 @@ from skimage.filters import threshold_multiotsu, threshold_otsu
 import matplotlib.pyplot as plt
 from augmentations import *
 
+TRAIN_TEST = "test"
+AUGMENT = 0
+
+def add_value_labels(ax, containers):
+    for container in containers:  # Loop over BarContainers
+        for bar in container:  # Each container contains a list of bars
+            height = bar.get_height()
+            ax.annotate(f'{height:.2f}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),  # 3 points vertical offset
+                        textcoords="offset points",
+                        ha='center', va='bottom')
+
+
 def load_image(image_path, label_path):
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
@@ -21,9 +35,6 @@ def load_image(image_path, label_path):
     image = image.astype(np.float32) / 255.0 
     label = label.astype(np.float32) / 255.0  
     return image, label
-
-def dice_coefficient(y_true, y_pred):
-    return 1 - dice(y_true, y_pred)
 
 
 def f1_score(predicted, mask):
@@ -43,7 +54,13 @@ def iou_score(prediction, target, smooth=1e-5):
     return iou.item()
 
 
-def otsus_thresholding(image):        
+def otsus_thresholding(image_path, mask_path): 
+    if AUGMENT:
+        image, ground_truth_mask = load_image(image_path, mask_path)
+    else: 
+        image = io.imread(image_path)
+        ground_truth_mask = io.imread(mask_path, as_gray=True)
+        
     # Convert to grayscale if needed
     if len(image.shape) == 3:
         image = color.rgb2gray(image)
@@ -54,29 +71,36 @@ def otsus_thresholding(image):
     thresholds = threshold_multiotsu(image_normalized)
     optimal_threshold = thresholds[len(thresholds) // 2] #select the second threshold
     binary_mask = (image_normalized > optimal_threshold).astype(np.uint8)
-    return binary_mask
+    return binary_mask, ground_truth_mask
 
 
 def threshold():
     # Load the training images and their corresponding masks
     image_paths = []
     mask_paths = []
-    base_mask_path = "brain_tumour/train/masks/"
-    base_image_path = "brain_tumour/train/images/"
+    base_mask_path = "brain_tumour/" + TRAIN_TEST + "/masks/"
+    base_image_path = "brain_tumour/" + TRAIN_TEST + "/images/"
 
-    for i in range(2755): #find al paths to the images
-        image_paths.append(f"{base_image_path}{i+1}.png")
-        mask_paths.append(f"{base_mask_path}{i+1}.png")    
+    # Only the test images dataset is actually used, but we wanted to see if there would be a difference for the train images of the dataset
+    amount_of_images = 0
+    if TRAIN_TEST == "train":
+        amount_of_images = 2755
+    else:
+        amount_of_images = 307
+
+    #for i in range(amount_of_images): #find al paths to the images
+    #    image_paths.append(f"{base_image_path}{i}.png")
+    #    mask_paths.append(f"{base_mask_path}{i}.png")   
+    image_paths.append(f"{base_image_path}{250}.png")
+    mask_paths.append(f"{base_mask_path}{250}.png")  
 
     # Create empty lists to store the evaluation scores
-    dice_scores = []
     f1_scores = []
     iou_scores = []
 
     # Loop through images and masks to apply threshold and evaluate
     for image_path, mask_path in zip(image_paths, mask_paths):
-        image, ground_truth_mask = load_image(image_path, mask_path)
-        binary_mask = otsus_thresholding(image)
+        binary_mask, ground_truth_mask = otsus_thresholding(image_path, mask_path)
         
         # Save the binary mask as an image
         binary_mask_path = mask_path.replace('masks', 'predicted_masks')  # Change directory accordingly
@@ -85,19 +109,45 @@ def threshold():
         # Load the original ground truth mask
         ground_truth_mask = (ground_truth_mask > 0).astype(np.uint8)
         
-        # Calculate Dice score and F1 score
-        dice_score = dice_coefficient(ground_truth_mask.flatten(), binary_mask.flatten())
+        # Calculate IoU score and F1 score
         f1 = f1_score(ground_truth_mask.flatten(), binary_mask.flatten()) 
         iou = iou_score(ground_truth_mask.flatten(), binary_mask.flatten())
         
-        dice_scores.append(dice_score)
         f1_scores.append(f1)
         iou_scores.append(iou)
 
-    # Print out the average Dice and F1 scores across all images
-    print(f'Average Dice Score: {np.mean(dice_scores):.4f}, Standard Deviation: {np.std(dice_scores):.4f}')
-    print(f'Average F1 Score: {np.mean(f1_scores):.4f}, Standard Deviation: {np.std(f1_scores):.4f}')
-    print(f'Average IoU Score: {np.mean(iou_scores):.4f}, Standard Deviation: {np.std(iou_scores):.4f}')
+
+    # Calculate the means and standard deviations
+    f1_mean = np.mean(f1_scores)
+    iou_mean = np.mean(iou_scores)
+
+    f1_std = np.std(f1_scores)
+    iou_std = np.std(iou_scores)
+
+    # Print out the average IoU and F1 scores across all images
+    print(f'Average F1 Score: {f1_mean:.4f}, Standard Deviation: {f1_std:.4f}')
+    print(f'Average IoU Score: {iou_mean:.4f}, Standard Deviation: {iou_std:.4f}')
+
+    # # Set the positions and width for the bars
+    # positions = np.arange(2)
+    # width = 0.5  # the width of the bars
+
+    # # Plotting the mean scores with standard deviation as error bars
+    # fig, ax = plt.subplots()
+    # bar1 = ax.bar(positions[0], f1_mean, width, yerr=f1_std, label='F1')
+    # bar2 = ax.bar(positions[1], iou_mean, width, yerr=iou_std, label='IoU')
+
+    # # Adding labels and title
+    # ax.set_ylabel('Scores')
+    # ax.set_title('Mean and Standard Deviation of Evaluation Metrics')
+    # ax.set_xticks(positions)
+    # ax.set_xticklabels(('F1', 'IoU'))
+    # ax.legend()    
+
+    # add_value_labels(ax, [bar1, bar2])
+
+    # # Show the plot
+    # plt.show()
 
 
 if __name__ == '__main__':
