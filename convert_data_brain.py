@@ -8,7 +8,7 @@ def convert_data_brain():
     # Define the total number of images
     total_images = 3064
 
-    dir_unlab_train_imgs ="brain_tumour/train/unlab_images"
+    dir_unlab_train_imgs = "brain_tumour/train/unlab_images"
     dir_lab_train_imgs = "brain_tumour/train/lab_images"
     dir_train_labels = "brain_tumour/train/masks"
     dir_test_imgs = "brain_tumour/test/images"
@@ -16,6 +16,7 @@ def convert_data_brain():
 
     # Create directories if they don't exist
     os.makedirs(dir_lab_train_imgs, exist_ok=True)
+    os.makedirs(dir_unlab_train_imgs, exist_ok=True)
     os.makedirs(dir_train_labels, exist_ok=True)
     os.makedirs(dir_test_imgs, exist_ok=True)
     os.makedirs(dir_test_labels, exist_ok=True)
