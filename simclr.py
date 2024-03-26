@@ -37,7 +37,6 @@ class ImageDataset(Dataset):
  
         return image1, image2
 
-
 def contrastive_loss(zis, zjs, batch_size, temperature):
     criterion = torch.nn.CrossEntropyLoss(reduction="sum")
     zijs = torch.cat((zis, zjs), dim=0)
@@ -73,7 +72,6 @@ def contrastive_loss(zis, zjs, batch_size, temperature):
     loss = criterion(logits, labels) 
     return loss / (2 * batch_size)
 
-
 def validate(dataloader_valset, model, batch_size):
     model.eval()
     bce_loss = nn.BCEWithLogitsLoss()
@@ -102,7 +100,6 @@ def validate(dataloader_valset, model, batch_size):
             
         valid_loss /= counter
     return valid_loss
-
 
 def save_model(model, save_file):
     torch.save(model.state_dict(), save_file)
@@ -189,6 +186,5 @@ def main():
         print("EPOCH: ", int(epoch))
         print("train loss", total_loss)
         print("valid loss", valid_loss)
-
-
+        
 main()
