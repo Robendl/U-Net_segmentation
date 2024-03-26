@@ -101,15 +101,17 @@ def load_path(model, path):
     return model
 
 
-def train(model, loss_function=combined_loss, learning_rate=0.00001, batch_size=8, num_epochs=30):
-    train_indices = list(range(0,2450))
-    valid_indices = list(range(0,307))
+def train(model, loss_function=combined_loss, learning_rate=0.0001, batch_size=8, num_epochs=30):
+    dataset_size = 551
+    valid_split = int(0.9 * dataset_size)
+    train_indices = list(range(0,valid_split))
+    valid_indices = list(range(0,dataset_size - valid_split))
 
-    image_indices = list(range(0,2757))
+    image_indices = list(range(0,dataset_size))
     random.shuffle(image_indices)
 
-    train_image_indices = image_indices[0:2450]
-    valid_image_indices = image_indices[2450:2757]
+    train_image_indices = image_indices[:valid_split]
+    valid_image_indices = image_indices[valid_split:]
 
     best_valid_loss = np.Inf
 
@@ -144,7 +146,7 @@ def train(model, loss_function=combined_loss, learning_rate=0.00001, batch_size=
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            save_file = "results/unet.pth" 
+            save_file = "results/unet_ss.pth"
             save_model(model, save_file)
 
         total_loss /= batch_counter
@@ -157,4 +159,5 @@ def train(model, loss_function=combined_loss, learning_rate=0.00001, batch_size=
 if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
+    model = load_path(model, "./results/simclr.pth")
     train(model)

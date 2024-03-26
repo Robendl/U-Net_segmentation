@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from augmentations import *
 from network import *
 
+
 class ImageDataset(Dataset):
     def __init__(self, indices, image_indices, transform=False):
         self.indices = indices
@@ -22,7 +23,7 @@ class ImageDataset(Dataset):
         random_img_number = self.image_indices[idx]
 
         #Load image
-        image_path = "brain_tumour/train/images/" + str(random_img_number) + ".png"
+        image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         image = cv2.resize(image, (512, 512))
@@ -120,18 +121,20 @@ def main():
 
     #model = load_path(model, "results/simclr.pth")
 
-    train_indices = list(range(0,2450))
-    valid_indices = list(range(0,307))
+    dataset_size = 2207
+    valid_split = int(dataset_size*0.9)
+    train_indices = list(range(0, valid_split))
+    valid_indices = list(range(0, dataset_size - valid_split))
 
-    image_indices = list(range(0,2757))
+    image_indices = list(range(0, valid_split))
     random.shuffle(image_indices)
 
-    train_image_indices = image_indices[0:2450]
-    valid_image_indices = image_indices[2450:2757]
+    train_image_indices = image_indices[:valid_split]
+    valid_image_indices = image_indices[valid_split:]
 
     num_epochs = 100
     batch_size = 8
-    learning_rate = 0.00001
+    learning_rate = 0.0001
     best_valid_loss = np.Inf
 
     train_dataset = ImageDataset(train_indices, train_image_indices, True)
@@ -139,7 +142,6 @@ def main():
 
     valid_dataset = ImageDataset(valid_indices, valid_image_indices)
     dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
@@ -155,7 +157,6 @@ def main():
 
             xis = xis.permute(0, 3, 1, 2)
             xjs = xjs.permute(0, 3, 1, 2)
-
 
             xis = xis.float().to('cuda')
             xjs = xjs.float().to('cuda')
@@ -173,12 +174,11 @@ def main():
             batch_counter += 1
             total_loss += loss.item()
 
-
         valid_loss = validate(dataloader_valset, model, batch_size)
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            save_file = "results/simclr.pth" 
+            save_file = "results/unet_simclr.pth"
             save_model(model, save_file)
 
         total_loss /= batch_counter
@@ -186,5 +186,7 @@ def main():
         print("EPOCH: ", int(epoch))
         print("train loss", total_loss)
         print("valid loss", valid_loss)
-        
-main()
+
+
+if __name__ == '__main__':
+    main()

@@ -5,8 +5,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
 #SBATCH --mem=32GB
-#SBATCH --job-name=unet-ss
-#SBATCH --output=unet-ss.out
+#SBATCH --job-name=simclr
+#SBATCH --output=simclr.out
 
 
 source /home3/s3799174/machinelearning/venv/bin/activate
@@ -19,4 +19,4 @@ module load matplotlib/3.7.0-gfbf-2022b
 module load Pillow/9.4.0-GCCcore-12.2.0
 
 
-python unet1.py
+python simclr.py

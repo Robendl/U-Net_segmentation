@@ -22,7 +22,7 @@ class ImageDataset(Dataset):
         random_img_number = self.image_indices[idx]
 
         #Load image
-        image_path = "brain_tumour/train/images/" + str(random_img_number) + ".png"
+        image_path = "brain_tumour/train/lab_images/" + str(random_img_number) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         #Load label
@@ -136,5 +136,5 @@ def train(model, image_indices, learning_rate=0.00001, loss_function=combined_lo
 if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
-    image_indices = list(range(0,2757))
+    image_indices = list(range(0,551))
     train(model, image_indices)
