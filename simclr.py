@@ -126,7 +126,7 @@ def main():
     train_indices = list(range(0, valid_split))
     valid_indices = list(range(0, dataset_size - valid_split))
 
-    image_indices = list(range(0, valid_split))
+    image_indices = list(range(0, dataset_size))
     random.shuffle(image_indices)
 
     train_image_indices = image_indices[:valid_split]
