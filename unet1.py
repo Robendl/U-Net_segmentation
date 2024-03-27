@@ -159,5 +159,5 @@ def train(model, loss_function=combined_loss, learning_rate=0.0001, batch_size=8
 if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
-    model = load_path(model, "./results/simclr.pth")
+    model = load_path(model, "./results/unet_simclr.pth")
     train(model)
