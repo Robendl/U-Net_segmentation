@@ -115,7 +115,7 @@ def load_path(model, path):
     print("model after", model.state_dict()['unet.down1.conv.0.weight'][0][0][0])
     return model
 
-def main():
+def train_simclr():
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="simclr")
     model = model.cuda()
 
@@ -189,4 +189,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    train_simclr()

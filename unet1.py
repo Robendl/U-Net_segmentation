@@ -101,7 +101,7 @@ def load_path(model, path):
     return model
 
 
-def train(model, loss_function=combined_loss, learning_rate=0.0001, batch_size=8, num_epochs=30):
+def train_unet(model, loss_function=combined_loss, learning_rate=0.0001, batch_size=8, num_epochs=30):
     dataset_size = 551
     valid_split = int(0.9 * dataset_size)
     train_indices = list(range(0,valid_split))
@@ -160,4 +160,4 @@ if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
     model = load_path(model, "./results/unet_simclr.pth")
-    train(model)
+    train_unet(model)
