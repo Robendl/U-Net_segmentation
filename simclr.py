@@ -121,7 +121,7 @@ def train_simclr():
 
     #model = load_path(model, "results/simclr.pth")
 
-    dataset_size = 2206
+    dataset_size = 2205
     valid_split = int(dataset_size*0.9)
     train_indices = list(range(0, valid_split))
     valid_indices = list(range(0, dataset_size - valid_split))
