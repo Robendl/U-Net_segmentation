@@ -23,7 +23,8 @@ class ImageDataset(Dataset):
         random_img_number = self.image_indices[idx]
 
         #Load image
-        image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
+        # image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
+        image_path = "/home1/s3799492/machine-learning-lung/brain_tumour/train/images/" + str(random_img_number) + ".png" 
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         image = cv2.resize(image, (512, 512))
@@ -116,10 +117,11 @@ def load_path(model, path):
     return model
 
 def train_simclr():
-    model = UnetWithHeader(n_channels=3, n_classes=1, mode="simclr")
+    model = UnetWithHeader(n_channels=3, n_classes=1, mode="cls")
     model = model.cuda()
 
-    #model = load_path(model, "results/simclr.pth")
+    model = load_path(model, "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth")
+    exit()
 
     dataset_size = 2205
     valid_split = int(dataset_size*0.9)
@@ -131,6 +133,8 @@ def train_simclr():
 
     train_image_indices = image_indices[:valid_split]
     valid_image_indices = image_indices[valid_split:]
+
+    print("indices", len(train_image_indices), len(valid_image_indices))
 
     num_epochs = 100
     batch_size = 8
@@ -178,7 +182,7 @@ def train_simclr():
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            save_file = "results/unet_simclr.pth"
+            save_file = "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth"
             save_model(model, save_file)
 
         total_loss /= batch_counter
