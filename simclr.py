@@ -120,7 +120,7 @@ def train_simclr():
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="cls")
     model = model.cuda()
 
-    model = load_path(model, "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth")
+    model = load_path(model, "/home4/s3806715/machine-learning-lung-oud/results/unet_simclr.pth")
     exit()
 
     dataset_size = 2205
