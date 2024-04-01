@@ -23,8 +23,7 @@ class ImageDataset(Dataset):
         random_img_number = self.image_indices[idx]
 
         #Load image
-        # image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
-        image_path = "/home1/s3799492/machine-learning-lung/brain_tumour/train/images/" + str(random_img_number) + ".png" 
+        image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         image = cv2.resize(image, (512, 512))
