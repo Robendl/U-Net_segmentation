@@ -94,10 +94,7 @@ def save_model(model, save_file):
 
 
 def load_path(model, path):
-    print('path:\t', path)
     state_dict = torch.load(path, map_location=torch.device('cuda:0'))
-
-    # print(state_dict)
 
     if 'head.0.weight' in state_dict:
         # Get the keys in the state_dict
@@ -108,8 +105,6 @@ def load_path(model, path):
         keys_to_remove = keys[idx:]
         for key in keys_to_remove:
             del state_dict[key]
-    
-    # print("after", state_dict)
     
     print("model before", model.state_dict()['unet.down1.conv.0.weight'][0][0][0])
     model.load_state_dict(state_dict, strict=False)
@@ -163,8 +158,7 @@ def train_unet(model, loss_function=combined_loss, learning_rate=0.0001, batch_s
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            #save_file = "results/unet_ss.pth"
-            save_file = "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth"
+            save_file = "results/unet_ss.pth"
             save_model(model, save_file)
 
         total_loss /= batch_counter
@@ -177,7 +171,6 @@ def train_unet(model, loss_function=combined_loss, learning_rate=0.0001, batch_s
 if __name__ == '__main__':
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="mlp")
     model = model.cuda()
-    #model = load_path(model, "./results/unet_simclr.pth")
-    model = load_path(model, "/home4/s3806715/machine-learning-lung-oud/results/unet_simclr.pth")
-    exit()
+    model = load_path(model, "./results/unet_simclr.pth")
+    # model = load_path(model, "/home4/s3806715/machine-learning-lung-oud/results/unet_simclr.pth")
     train_unet(model)

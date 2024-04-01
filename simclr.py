@@ -117,11 +117,8 @@ def load_path(model, path):
     return model
 
 def train_simclr():
-    model = UnetWithHeader(n_channels=3, n_classes=1, mode="cls")
+    model = UnetWithHeader(n_channels=3, n_classes=1, mode="simclr")
     model = model.cuda()
-
-    model = load_path(model, "/home4/s3806715/machine-learning-lung-oud/results/unet_simclr.pth")
-    exit()
 
     dataset_size = 2205
     valid_split = int(dataset_size*0.9)
@@ -182,7 +179,7 @@ def train_simclr():
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            save_file = "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth"
+            save_file = "./results/unet_simclr.pth"
             save_model(model, save_file)
 
         total_loss /= batch_counter
