@@ -1,8 +1,10 @@
+import argparse
 import torch
 import torch.nn as nn
 import cv2
 import random
 import numpy as np
+from sklearn.model_selection import KFold
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import torch.optim as optim
@@ -23,7 +25,8 @@ class ImageDataset(Dataset):
         random_img_number = self.image_indices[idx]
 
         #Load image
-        image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
+        # image_path = "brain_tumour/train/unlab_images/" + str(random_img_number) + ".png"
+        image_path = "/home1/s3799492/machine-learning-lung/brain_tumour/train/simclr_images/" + str(random_img_number) + ".png" 
         image = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
         image = cv2.resize(image, (512, 512))
@@ -115,76 +118,93 @@ def load_path(model, path):
     print("model after", model.state_dict()['unet.down1.conv.0.weight'][0][0][0])
     return model
 
-def train_simclr():
+def train_simclr(args):
     model = UnetWithHeader(n_channels=3, n_classes=1, mode="simclr")
     model = model.cuda()
 
-    dataset_size = 2205
-    valid_split = int(dataset_size*0.9)
-    train_indices = list(range(0, valid_split))
-    valid_indices = list(range(0, dataset_size - valid_split))
+    #model = load_path(model, "/home1/s3799492/machine-learning-lung/results/unet_simclr.pth")
 
+    dataset_size = 2206
     image_indices = list(range(0, dataset_size))
-    random.shuffle(image_indices)
 
-    train_image_indices = image_indices[:valid_split]
-    valid_image_indices = image_indices[valid_split:]
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)  # 5-fold cross-validation
 
-    print("indices", len(train_image_indices), len(valid_image_indices))
+    for idx_fold, (train_image_indices, valid_image_indices) in enumerate(kf.split(image_indices)):
+        print(idx_fold, len(train_image_indices), len(valid_image_indices))
 
-    num_epochs = 100
-    batch_size = 16
-    learning_rate = 0.0001
-    best_valid_loss = np.Inf
+        train_indices = list(range(0, len(train_image_indices)))
+        valid_indices = list(range(0, len(valid_image_indices)))
 
-    train_dataset = ImageDataset(train_indices, train_image_indices, True)
-    dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+        num_epochs = 100
+        batch_size = 16
+        learning_rate = 0.0001
+        best_valid_loss = np.Inf
 
-    valid_dataset = ImageDataset(valid_indices, valid_image_indices)
-    dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+        train_dataset = ImageDataset(train_indices, train_image_indices, True)
+        dataloader_trainset = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
+        valid_dataset = ImageDataset(valid_indices, valid_image_indices)
+        dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
-    for epoch in range(num_epochs):
-        model.train()
-        total_loss = 0.0
-        batch_counter = 1
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
+                                                                                last_epoch=-1)
+        for epoch in range(num_epochs):
+            model.train()
+            total_loss = 0.0
+            batch_counter = 1
 
-        for (xis, xjs) in dataloader_trainset:
-            optimizer.zero_grad()
+            for (xis, xjs) in dataloader_trainset:
+                optimizer.zero_grad()
 
-            xis = xis.permute(0, 3, 1, 2)
-            xjs = xjs.permute(0, 3, 1, 2)
+                xis = xis.permute(0, 3, 1, 2)
+                xjs = xjs.permute(0, 3, 1, 2)
 
-            xis = xis.float().to('cuda')
-            xjs = xjs.float().to('cuda')
+                xis = xis.float().to('cuda')
+                xjs = xjs.float().to('cuda')
 
-            zis = model(xis)
-            zjs = model(xjs)
+                zis = model(xis)
+                zjs = model(xjs)
 
-            zis = F.normalize(zis, dim=1)
-            zjs = F.normalize(zjs, dim=1)
+                print("shapes", zis.shape, zjs.shape)
+                exit()
 
-            loss = contrastive_loss(zis, zjs, batch_size, 0.5)
+                if zis.shape[0] != 16:
+                    continue
 
-            loss.backward()
-            optimizer.step()
-            batch_counter += 1
-            total_loss += loss.item()
 
-        valid_loss = validate(dataloader_valset, model, batch_size)
+                zis = F.normalize(zis, dim=1)
+                zjs = F.normalize(zjs, dim=1)
 
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            save_file = "./results/unet_simclr.pth"
-            save_model(model, save_file)
+                loss = contrastive_loss(zis, zjs, batch_size, 0.5)
 
-        total_loss /= batch_counter
+                loss.backward()
+                optimizer.step()
+                batch_counter += 1
+                total_loss += loss.item()
 
-        print("EPOCH: ", int(epoch))
-        print("train loss", total_loss)
-        print("valid loss", valid_loss)
+            valid_loss = validate(dataloader_valset, model, batch_size)
+
+            if valid_loss < best_valid_loss:
+                best_valid_loss = valid_loss
+                save_file = "/home1/s3799492/machine-learning-lung/results/simclr_fold_" + str(args.fold) + ".pth"
+                save_model(model, save_file)
+
+            total_loss /= batch_counter
+
+            print("EPOCH: ", int(epoch))
+            print("train loss", total_loss)
+            print("valid loss", valid_loss)
+
+        exit()
+
+def parse_option():
+    parser = argparse.ArgumentParser(description="Train SimCLR model")
+    parser.add_argument("--fold", type=int, help="Fold to save the trained model")
+    args = parser.parse_args()
+    return args
 
 
 if __name__ == '__main__':
-    train_simclr()
+    args = parse_option()
+    train_simclr(args)
