@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    training_loss = np.load("outputs/training-loss0.npy")
-    validation_loss = np.load("outputs/validation-loss0.npy")
+    training_loss = np.load("../outputs/training-loss0.npy")
+    validation_loss = np.load("../outputs/validation-loss0.npy")
 
     epochs = range(1, len(training_loss) + 1)
 
