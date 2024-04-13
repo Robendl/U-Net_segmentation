@@ -10,6 +10,5 @@ Below the purpose of each file is described.
 `network.py`: Used to initialize the U-Net architecture.\
 `simclr.py`: Contains self-supervised learning procedure SimCLR.\
 `unet.py`: Contains supervised learning procedure of the U-Net using k-fold validaiton.\
-`test.py`: Used to get evaluation scores.
-
+`test.py`: Used to get evaluation scores.\
 `gridsearch.py`: Code used for hyperparameter tuning of the supervised learning procedure.
