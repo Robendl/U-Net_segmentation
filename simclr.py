@@ -133,7 +133,7 @@ def train_simclr():
     print("indices", len(train_image_indices), len(valid_image_indices))
 
     num_epochs = 100
-    batch_size = 8
+    batch_size = 16
     learning_rate = 0.0001
     best_valid_loss = np.Inf
 
@@ -144,8 +144,6 @@ def train_simclr():
     dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0,
-                                                                            last_epoch=-1)
 
     for epoch in range(num_epochs):
         model.train()

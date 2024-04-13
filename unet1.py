@@ -132,7 +132,6 @@ def train_unet(model, loss_function=combined_loss, learning_rate=0.0001, batch_s
     dataloader_valset = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=10e-6)
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(dataloader_trainset), eta_min=0, last_epoch=-1)
 
     for epoch in range(num_epochs):
         model.train()
